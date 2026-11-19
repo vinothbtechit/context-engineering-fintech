@@ -69,6 +69,21 @@ Module 1 needs only Python 3.10+ with no external dependencies. Later modules ad
 
 **Rule of thumb:** write examples in the exact output schema. Models copy examples more faithfully than they follow format instructions.
 
+### Why it matters: [`cost_calculator.py`](modules/01-context-types/cost_calculator.py)
+
+Skipping engineered context (types 3–4 especially) and dumping raw documentation into every request doesn't just hurt accuracy — it shows up directly on the bill. Running the script on a 10K-requests/day scenario:
+
+```
+Bad Context (Document Dump)      Input tokens: 50,000   Monthly cost: $47,250.00
+Medium Context (Some RAG)        Input tokens: 10,000   Monthly cost: $11,250.00
+Good Context (Engineered)        Input tokens: 2,000    Monthly cost: $4,050.00
+
+MONTHLY SAVINGS: $43,200.00 (91%)
+YEARLY SAVINGS: $518,400.00
+```
+
+Same task, same model, 91% lower cost — just from engineering what goes into the context window.
+
 ---
 
 ## The Context Assembler
