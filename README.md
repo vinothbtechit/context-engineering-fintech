@@ -12,7 +12,7 @@ Most LLM failures in production come from the context, not the prompt wording: t
 
 | # | Module | What you'll learn | Status |
 |---|--------|-------------------|--------|
-| 1 | [Context Types](modules/01-context-types/) | The 6 building blocks of every LLM call and how to build each one | ✅ Available |
+| 1 | [Context Types](modules/01-context-types/) | The 6 building blocks of every LLM call, how to build each one, and the cost of getting it wrong | ✅ Available |
 | 2 | [Context Assembly Order](modules/02-assembly-order/) | Why order changes cost, accuracy and cacheability: static-first, task-last | 🔜 Coming soon |
 | 3 | [Right Info at Right Time](modules/03-right-info-right-time/) | Just-in-time retrieval, relevance thresholds, token budgets, memory summarisation | 🔜 Coming soon |
 | 4 | [Context Templates](modules/04-context-templates/) | Versioned, testable templates stored in S3, with one template per use case | 🔜 Coming soon |
@@ -34,7 +34,7 @@ context-engineering-fintech/
 ├── modules/
 │   ├── 01-context-types/
 │   │   ├── six_context_types.py
-│   │   └── README.md
+│   │   └── cost_calculator.py
 │   ├── 02-assembly-order/
 │   ├── 03-right-info-right-time/
 │   ├── 04-context-templates/
@@ -46,9 +46,10 @@ context-engineering-fintech/
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-username>/context-engineering-fintech.git
+git clone https://github.com/vinothbtechit/context-engineering-fintech.git
 cd context-engineering-fintech
 python modules/01-context-types/six_context_types.py
+python modules/01-context-types/cost_calculator.py
 ```
 
 Module 1 needs only Python 3.10+ with no external dependencies. Later modules add AWS (S3, DynamoDB, a vector index) and an LLM provider of your choice.
