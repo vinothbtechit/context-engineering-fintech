@@ -13,7 +13,7 @@ Most LLM failures in production come from the context, not the prompt wording: t
 | # | Module | What you'll learn | Status |
 |---|--------|-------------------|--------|
 | 1 | [Context Types](modules/01-context-types/) | The 6 building blocks of every LLM call, how to build each one, and the cost of getting it wrong | ✅ Available |
-| 2 | [Context Assembly Order](modules/02-assembly-order/) | Why order changes cost, accuracy and cacheability: static-first, task-last | 🔜 Coming soon |
+| 2 | [Context Assembly Order](modules/02-assembly_order.py) | Why order changes cost, accuracy and cacheability: static-first, task-last | ✅ Available |
 | 3 | [Right Info at Right Time](modules/03-right-info-right-time/) | Just-in-time retrieval, relevance thresholds, token budgets, memory summarisation | 🔜 Coming soon |
 | 4 | [Context Templates](modules/04-context-templates/) | Versioned, testable templates stored in S3, with one template per use case | 🔜 Coming soon |
 | 5 | [Project: Assembly Pipeline](modules/05-assembly-pipeline/) | The assembler as a service: pin, retrieve, budget, order, validate, audit | 🔜 Coming soon |
@@ -35,7 +35,7 @@ context-engineering-fintech/
 │   ├── 01-context-types/
 │   │   ├── six_context_types.py
 │   │   └── cost_calculator.py
-│   ├── 02-assembly-order/
+│   ├── 02-assembly_order.py
 │   ├── 03-right-info-right-time/
 │   ├── 04-context-templates/
 │   ├── 05-assembly-pipeline/
@@ -50,9 +50,10 @@ git clone https://github.com/vinothbtechit/context-engineering-fintech.git
 cd context-engineering-fintech
 python modules/01-context-types/six_context_types.py
 python modules/01-context-types/cost_calculator.py
+python modules/02-assembly_order.py
 ```
 
-Module 1 needs only Python 3.10+ with no external dependencies. Later modules add AWS (S3, DynamoDB, a vector index) and an LLM provider of your choice.
+Module 1 needs only Python 3.10+ with no external dependencies. Module 2 calls the Claude API (needs `ANTHROPIC_API_KEY`). Later modules add AWS (S3, DynamoDB, a vector index) and an LLM provider of your choice.
 
 ---
 
@@ -83,6 +84,28 @@ YEARLY SAVINGS: $518,400.00
 ```
 
 Same task, same model, 91% lower cost — just from engineering what goes into the context window.
+
+---
+
+## Module 2 at a glance: assembly order
+
+[`assembly_order.py`](modules/02-assembly_order.py) runs the same question and the same documentation through Claude twice — once with the task first and instructions buried ("bad order"), once with instructions first and the task last ("good order") — and compares token usage and latency.
+
+**Optimal order:**
+
+```
+1. Instructional  →  role, rules
+2. Examples       →  few-shot pairs
+3. Knowledge      →  retrieved docs
+4. Memory         →  conversation history
+5. Tools          →  available functions
+6. Output         →  response format
+7. Task           →  the current question (ALWAYS LAST)
+```
+
+Static blocks (instructional, examples, tools, output) stay identical across requests; dynamic blocks (knowledge, memory) and the task change every time. Putting static content first and the task last means the static prefix can be cached — the model doesn't reprocess it on every call, which cuts latency and cost in production.
+
+The script also ships `assemble_context()`, a production-ready function that assembles role, rules, examples, retrieved docs, history, tools and output format into this order automatically.
 
 ---
 
